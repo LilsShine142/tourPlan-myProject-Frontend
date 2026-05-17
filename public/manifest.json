@@ -1,0 +1,6 @@
+{
+  "name": "Tour Planner",
+  "short_name": "Tour",
+  "start_url": "/",
+  "display": "standalone"
+}
