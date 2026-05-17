@@ -36,7 +36,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-screen bg-[#F8F9FA] font-sans antialiased">
+      {/* Thêm dòng này để React bỏ qua việc check lỗi mismatch thuộc tính trên body do Extension gây ra */}
+      <body 
+        className="min-h-screen bg-[#F8F9FA] font-sans antialiased"
+        suppressHydrationWarning
+      >
         {/* <AntdRegistry> */}
           <ConfigProvider theme={ANT_DESIGN_THEME} locale={viVN}>
             <AntApp>

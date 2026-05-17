@@ -11,7 +11,7 @@ export default function NavigationBar() {
 
   // Danh sách các tab dựa trên thiết kế UI của bạn
   const navItems = [
-    { name: 'Nhóm', icon: Users, path: APP_ROUTES.MAIN.DASHBOARD || '/' },
+    { name: 'Nhóm', icon: Users, path: APP_ROUTES.MAIN.GROUP || '/groups' },
     { name: 'Lịch trình', icon: Map, path: APP_ROUTES.MAIN.TRIPS || '/trips' },
     { name: 'Lịch', icon: Calendar, path: APP_ROUTES.MAIN.CALENDAR || '/calendar' },
     { name: 'Cá nhân', icon: User, path: APP_ROUTES.PROFILE.INDEX || '/profile' },

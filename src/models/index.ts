@@ -46,24 +46,49 @@ export type GroupType = "trip" | "household" | "general"; // Chi tiêu chung | N
 export type GroupCurrency = "VND" | "USD" | "EUR" | "JPY";
 export type MemberRole = "admin" | "guest";
 
+// export interface Group {
+//   id: string;
+//   name: string;
+//   type: GroupType;
+//   currency: GroupCurrency;
+//   coverImageUrl?: string;
+//   createdBy: string;               // userId
+//   createdAt: string;
+//   updatedAt: string;
+// }
+
+// export interface GroupMember {
+//   id: string;
+//   groupId: string;
+//   userId?: string;                 // null nếu là khách (guest)
+//   guestName?: string;              // dùng khi userId null
+//   avatarUrl?: string;
+//   role: MemberRole;
+//   joinedAt: string;
+// }
+
+// Sửa đổi 1: Bảng Group
 export interface Group {
   id: string;
   name: string;
   type: GroupType;
   currency: GroupCurrency;
   coverImageUrl?: string;
-  createdBy: string;               // userId
+  inviteCode?: string;     // BỔ SUNG: Dùng để tạo link invite (/invite/12345)
+  createdBy: string;       // userId
   createdAt: string;
   updatedAt: string;
 }
 
+// Sửa đổi 2: Bảng GroupMember
 export interface GroupMember {
   id: string;
   groupId: string;
-  userId?: string;                 // null nếu là khách (guest)
-  guestName?: string;              // dùng khi userId null
+  userId?: string;         // null nếu là khách (guest)
+  guestName?: string;      // dùng khi userId null
   avatarUrl?: string;
   role: MemberRole;
+  status: "pending" | "accepted"; // BỔ SUNG: Trạng thái duyệt vào nhóm
   joinedAt: string;
 }
 
@@ -99,6 +124,7 @@ export interface BillSplit {
   paidAt?: string;
 }
 
+// Sửa đổi 3: Bảng Bill (Nếu bạn muốn tính năng "chờ mọi người xác nhận" như Transaction cũ)
 export interface Bill {
   id: string;
   groupId: string;
@@ -108,13 +134,30 @@ export interface Bill {
   category: BillCategory;
   note?: string;
   receiptImageUrl?: string;
-  paidBy: string;                  // groupMemberId
+  paidBy: string;          // groupMemberId
   splitMethod: SplitMethod;
   splits: BillSplit[];
-  date: string;                    // ISO date
+  confirmations?: string[];// BỔ SUNG: Mảng chứa memberId của những người đã bấm "Xác nhận bill này đúng"
+  date: string;            // ISO date
   createdAt: string;
   updatedAt: string;
 }
+// export interface Bill {
+//   id: string;
+//   groupId: string;
+//   name: string;
+//   amount: number;
+//   currency: GroupCurrency;
+//   category: BillCategory;
+//   note?: string;
+//   receiptImageUrl?: string;
+//   paidBy: string;                  // groupMemberId
+//   splitMethod: SplitMethod;
+//   splits: BillSplit[];
+//   date: string;                    // ISO date
+//   createdAt: string;
+//   updatedAt: string;
+// }
 
 export interface BillWithPayer extends Bill {
   payerName: string;
@@ -295,15 +338,15 @@ export interface Feedback {
 // ------------------------------------------------------------
 // TRANSACTION & BALANCE (Giao dịch & Số dư)
 // ------------------------------------------------------------
-export interface Transaction {
-  id: string;
-  tripId: string;
-  payerId: string;        // Người trả tiền ban đầu
-  amount: number;
-  description: string;
-  date: Date;
-  confirmations: number;   // Số lượng thành viên đã xác nhận (vd: 1/2)
-}
+// export interface Transaction {
+//   id: string;
+//   tripId: string;
+//   payerId: string;        // Người trả tiền ban đầu
+//   amount: number;
+//   description: string;
+//   date: Date;
+//   confirmations: number;   // Số lượng thành viên đã xác nhận (vd: 1/2)
+// }
 
 export interface UserBalance {
   userId: string;
