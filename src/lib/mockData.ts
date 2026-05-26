@@ -55,6 +55,7 @@ export const MOCK_GROUP_MEMBERS: GroupMember[] = [
     userId:    "user-001",
     role:      "admin",
     avatarUrl: "https://api.dicebear.com/7.x/thumbs/svg?seed=ptsu",
+    status:    "accepted",
     joinedAt:  "2026-04-01T00:00:00Z",
   },
   {
@@ -63,6 +64,7 @@ export const MOCK_GROUP_MEMBERS: GroupMember[] = [
     userId:    "user-002",
     guestName: "Test",
     role:      "guest",
+    status:    "accepted",
     joinedAt:  "2026-04-01T08:00:00Z",
   },
 ];

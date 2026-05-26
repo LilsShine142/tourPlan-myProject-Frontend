@@ -4,7 +4,7 @@ export const APP_ROUTES = {
     REGISTER: '/register',
   },
   MAIN: {
-    DASHBOARD: '/',
+    DASHBOARD: '/dashboard',
     TRIPS: '/trips',
     TRIP_DETAIL: (id: string) => `/trips/${id}`,
     CALENDAR: '/calendar',

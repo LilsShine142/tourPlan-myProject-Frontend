@@ -69,6 +69,16 @@ html {
     font-weight: 600 !important;
 }
 
+/* Export groups */
+/* Custom cho màn preview export ảnh để ẩn bớt UI rườm rà của Carousel */
+.trip-export-modal .ant-modal-content {
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0;
+}
+.trip-export-modal .slick-dots li button {
+  background: #0d9488 !important; /* Màu teal-600 */
+}
 
 /* ── Shadcn UI Base Theme (Tailwind v4 Standard) ── */
 @theme inline {
