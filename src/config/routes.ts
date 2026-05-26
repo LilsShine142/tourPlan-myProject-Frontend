@@ -5,6 +5,7 @@ export const APP_ROUTES = {
   },
   MAIN: {
     DASHBOARD: '/dashboard',
+    LANDING: '/', 
     TRIPS: '/trips',
     TRIP_DETAIL: (id: string) => `/trips/${id}`,
     CALENDAR: '/calendar',
