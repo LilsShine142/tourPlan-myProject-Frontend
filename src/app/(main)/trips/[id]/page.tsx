@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Tag, Drawer, Button, Input, Modal, message } from "antd";
+import { Tag, Drawer, Button, Input, message } from "antd";
 import {
   ArrowLeftOutlined,
   EllipsisOutlined,
