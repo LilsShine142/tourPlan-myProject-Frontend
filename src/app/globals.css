@@ -153,6 +153,12 @@ html {
         --input: 217.2 32.6% 17.5%;
         --ring: 160 100% 36%;
     }
+  .maplibregl-popup-content {
+    @apply bg-transparent! shadow-none! p-0! rounded-none!;
+    }
+  .maplibregl-popup-tip {
+    @apply hidden!;
+    }
 }
 
 @layer base {

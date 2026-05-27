@@ -16,7 +16,8 @@ export const MOCK_CURRENT_USER: UserProfile = {
   id:              "user-001",
   displayName:     "0065_ Phạm Thanh Sự",
   email:           "psu95228@gmail.com",
-  avatarUrl:       "https://api.dicebear.com/7.x/thumbs/svg?seed=ptsu",
+  avatarUrl: "https://api.dicebear.com/7.x/thumbs/svg?seed=ptsu",
+  coverUrl: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=2000",
   provider:        "email",
   groupCount:      1,
   bankAccountCount: 0,
@@ -25,6 +26,15 @@ export const MOCK_CURRENT_USER: UserProfile = {
   appVersion:      "1.2.0",
   createdAt:       "2024-01-01T00:00:00Z",
   updatedAt:       "2026-04-25T10:00:00Z",
+  bio:             "Kẻ mộng mơ thích lang thang khắp thế gian 🌍✈️",
+  birthday:        "1995-01-01",
+  gender:          "male",
+  phone:           "0123456789",
+  address:         "TP. Hồ Chí Minh",
+  socialLinks:     {
+    facebook: "https://facebook.com/ptsu",
+    instagram: "https://instagram.com/ptsu",
+  },
 };
 
 export const MOCK_USERS: User[] = [
@@ -150,7 +160,7 @@ export const MOCK_TRIPS: TripWithStats[] = [
     id:        "trip-001",
     groupId:   "group-001",
     name:      "Test",
-    coverImageUrl: "https://api.dicebear.com/7.x/thumbs/svg?seed=ptsu",
+    coverImageUrl: "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&q=80&w=2000",
     currency:  "VND",
     status:    "ongoing",
     startDate: "2026-04-24",
@@ -231,19 +241,43 @@ export const MOCK_TRIPS: TripWithStats[] = [
 // ============================================================
 export const MOCK_ITINERARY_LOCATIONS: ItineraryLocation[] = [
   {
-    id:        "loc-001",
-    dayId:     "day-001",
-    tripId:    "trip-001",
-    name:      "Chợ Đà Lạt",
-    address:   "Chợ Đà Lạt, 24 Đường Nguyễn Thị Minh Khai",
-    category:  "shopping",
-    lat:       11.9404,
-    lng:       108.4383,
-    startTime: "09:00",
-    endTime:   "10:00",
-    order:     1,
-    createdAt: "2026-04-24T00:00:00Z",
+    id: "loc-1",
+    dayId: "day-001",
+    tripId: "trip-001",
+    name: "Sân bay Tân Sơn Nhất",
+    category: "transport",
+    startTime: "08:00",
+    endTime: "09:30",
+    address: "Tân Bình, TP. HCM",
+    order: 1,
+    createdAt: "2026-05-01T10:00:00Z",
+    date: ""
   },
+      {
+        id: "loc-2",
+        dayId: "day-001",
+        tripId: "trip-001",
+        name: "Colline Hotel Đà Lạt",
+        category: "accommodation",
+        startTime: "14:00",
+        address: "10 Phan Bội Châu, Đà Lạt",
+        order: 2,
+        createdAt: "2026-05-01T10:00:00Z",
+        date: ""
+      },
+      {
+        id: "loc-3",
+        dayId: "day-002",
+        tripId: "trip-001",
+        name: "Đồi chè Cầu Đất",
+        category: "attraction",
+        startTime: "05:00",
+        endTime: "08:00",
+        address: "Thôn Cầu Đất, Xuân Trường",
+        order: 1,
+        createdAt: "2026-05-01T10:00:00Z",
+        date: ""
+      }
 ];
 
 export const MOCK_ITINERARY_DAYS: ItineraryDay[] = [
@@ -255,6 +289,14 @@ export const MOCK_ITINERARY_DAYS: ItineraryDay[] = [
     title:     "Thứ Sáu, 24/04",
     locations: MOCK_ITINERARY_LOCATIONS,
   },
+  {
+    id:        "day-002",
+    tripId:    "trip-001",
+    date:      "2026-04-25",
+    dayNumber: 2,
+    title:     "Thứ Bảy, 25/04",
+    locations: MOCK_ITINERARY_LOCATIONS,
+  }
 ];
 
 // ============================================================

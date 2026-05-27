@@ -8,9 +8,9 @@ import "./globals.css";
 import { Inter } from "next/font/google";
 import { cn } from "@/lib/utils";
 import GlobalLoadingWrapper from "@/components/ui/GlobalLoadingWrapper";
+import InitialSplashScreen from "@/components/ui/InitialSplashScreen"; 
 
-const inter = Inter({subsets:['latin'],variable:'--font-sans'});
-
+const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 export const metadata: Metadata = {
   title: 'Tour Planner & Split Bill',
   description: "Chia bill nhanh gọn và lên kế hoạch du lịch dễ dàng cùng bạn bè",
@@ -28,6 +28,8 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+
+  
   return (
     <html lang="vi" className={cn("font-sans", inter.variable)}>
       <head>
@@ -41,14 +43,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         className="min-h-screen bg-[#F8F9FA] font-sans antialiased"
         suppressHydrationWarning
       >
-        {/* <AntdRegistry> */}
+        <AntdRegistry>
           <ConfigProvider theme={ANT_DESIGN_THEME} locale={viVN}>
             <AntApp>
-              {children}
+              {/* 2. BỌC CHchildren bằng InitialSplashScreen để tạo hiệu ứng mượt mà khi chuyển trang/load lại trang */}
+              <InitialSplashScreen>
+                {children}
+              </InitialSplashScreen>
             </AntApp>
           </ConfigProvider>
-        {/* </AntdRegistry> */}
-        <GlobalLoadingWrapper />
+        </AntdRegistry>
+        {/* <GlobalLoadingWrapper /> */}
       </body>
     </html>
   );
