@@ -21,9 +21,10 @@ interface ItineraryContentProps {
   board: DayColumn[];
   setIsEditMode: (v: boolean) => void;
   onAddPlace: (dayId: string) => void;
+  onOpenPlaceDetail: (dayId: string, item: PlaceItem) => void;
 }
 
-const ItineraryContent: React.FC<ItineraryContentProps> = ({ board, setIsEditMode, onAddPlace }) => (
+const ItineraryContent: React.FC<ItineraryContentProps> = ({ board, setIsEditMode, onAddPlace, onOpenPlaceDetail }) => (
   <div className="space-y-6">
     {board.map((day, idx) => (
       <div key={day.id}>
@@ -44,7 +45,9 @@ const ItineraryContent: React.FC<ItineraryContentProps> = ({ board, setIsEditMod
           </button>
         </div>
         <div className="ml-4 pl-4 border-l-2 border-dashed border-teal-600/20 space-y-4">
-          {day.items.map((loc) => <LocationCard key={loc.id} loc={loc} />)}
+          {day.items.map((loc) => (
+            <LocationCard key={loc.id} loc={loc} onClick={() => onOpenPlaceDetail(day.id, loc)} />
+          ))}
         </div>
       </div>
     ))}

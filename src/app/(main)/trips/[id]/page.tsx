@@ -81,6 +81,54 @@ export default function TripDetailPage() {
   // ── States Gốc ──
   const [isMounted, setIsMounted] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  // Bottom sheet mobile states
+  const [isExpanded, setIsExpanded] = useState(false); // sheet mở rộng hay không
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState(0);
+  const startY = useRef(0);
+  // Bottom sheet handlers
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (isEditMode) return; // Không cho kéo khi đang edit
+    e.currentTarget.setPointerCapture(e.pointerId);
+    startY.current = e.clientY;
+    setIsDragging(true);
+    setDragOffset(0);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isDragging) return;
+    const deltaY = e.clientY - startY.current;
+    if (isExpanded && deltaY < 0) {
+      setDragOffset(deltaY * 0.15);
+    } else if (!isExpanded && deltaY > 0) {
+      setDragOffset(deltaY * 0.15);
+    } else {
+      setDragOffset(deltaY);
+    }
+  };
+
+  const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isDragging) return;
+    e.currentTarget.releasePointerCapture(e.pointerId);
+    setIsDragging(false);
+
+    if (Math.abs(dragOffset) < 5) {
+      setIsExpanded(!isExpanded);
+    } else {
+      if (isExpanded && dragOffset > 50) setIsExpanded(false);
+      if (!isExpanded && dragOffset < -50) setIsExpanded(true);
+    }
+    setDragOffset(0);
+  };
+
+  const getSheetTransform = () => {
+    if (isDragging) {
+      return isExpanded
+        ? `translateY(${dragOffset}px)`
+        : `translateY(calc(100% - 80px + ${dragOffset}px))`;
+    }
+    return isExpanded ? `translateY(0)` : `translateY(calc(100% - 80px))`;
+  };
 
   const [activeTab, setActiveTab] = useState<ActiveTab>("itinerary");
   const [filterTab, setFilterTab] = useState<FilterTab>("all");
@@ -234,7 +282,8 @@ export default function TripDetailPage() {
           onOpenPlaceDetail={openPlaceDetail}
         />
       );
-    return <ItineraryContent board={board} setIsEditMode={setIsEditMode} onAddPlace={handleOpenAddPlace} />;
+    // Truyền onOpenPlaceDetail cho cả mobile và desktop
+    return <ItineraryContent board={board} setIsEditMode={setIsEditMode} onAddPlace={handleOpenAddPlace} onOpenPlaceDetail={openPlaceDetail} />;
   };
 
   const renderChecklistContent = () => (
@@ -335,76 +384,80 @@ export default function TripDetailPage() {
 
 
 
-      {/* ── MOBILE: Bottom Sheet cho Cập nhật hoạt động ── */}
-      {typeof window !== "undefined" && window.innerWidth < 768 && (
-        <MobileBottomSheet
-          open={isDetailOpen}
-          onClose={() => setIsDetailOpen(false)}
-          title="Cập nhật hoạt động"
-          subtitle={editingItem ? `Địa điểm: ${editingItem.item.name}` : undefined}
-          defaultVh={70}
-          maxVh={90}
+
+      {/* ── MOBILE LAYOUT: Bottom Sheet kéo thả ── */}
+      <div
+        className="md:hidden absolute bottom-0 left-0 right-0 z-40 bg-white rounded-t-4xl shadow-[0_-12px_40px_rgba(0,0,0,0.12)] flex flex-col h-[85vh] will-change-transform"
+        style={{
+          transform: getSheetTransform(),
+          transition: isDragging ? 'none' : 'transform 0.45s cubic-bezier(0.32,0.72,0,1)'
+        }}
+      >
+        <div
+          className="h-20 shrink-0 flex flex-col justify-center px-6 cursor-grab active:cursor-grabbing border-b border-gray-50 bg-white rounded-t-4xl select-none touch-none"
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
         >
-          {editingItem && (
-            <div className="p-5 space-y-5">
-              <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-start gap-3.5">
-                <div className="w-11 h-11 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center shrink-0">
-                  <MapPin size={20} />
-                </div>
-                <div>
-                  <h3 className="font-black text-base text-gray-900">{editingItem.item.name}</h3>
-                  <p className="text-xs text-gray-400 font-medium flex items-center gap-1 mt-0.5">
-                    <Calendar size={12} /> Thuộc {board.find(c => c.id === editingItem.dayId)?.day}
-                  </p>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1 mb-1 block">Thời gian dự kiến</label>
-                  <Input 
-                    type="time" 
-                    value={formData.time}
-                    onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                    size="large"
-                    prefix={<Clock size={16} className="text-gray-400 mr-1" />}
-                    className="rounded-xl border-gray-200 h-11 shadow-sm font-medium"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1 mb-1 block">Chi phí ước tính</label>
-                  <Input 
-                    placeholder="Vd: 150,000đ, Miễn phí..."
-                    value={formData.cost}
-                    onChange={(e) => setFormData({ ...formData, cost: e.target.value })}
-                    size="large"
-                    prefix={<DollarSign size={16} className="text-gray-400 mr-1" />}
-                    className="rounded-xl border-gray-200 h-11 shadow-sm font-medium"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1 mb-1 block">Ghi chú hành trình</label>
-                  <Input.TextArea 
-                    placeholder="Nhập ghi chú cho địa điểm này..."
-                    value={formData.note}
-                    onChange={(e) => setFormData({ ...formData, note: e.target.value })}
-                    autoSize={{ minRows: 3, maxRows: 5 }}
-                    className="rounded-xl border-gray-200 shadow-sm p-3 text-xs font-medium"
-                  />
-                </div>
-                <button
-                  onClick={handleSaveDetail}
-                  className="w-full mt-2 bg-teal-600 text-white rounded-xl font-semibold py-3 text-base shadow-sm active:scale-95 transition-all"
-                >
-                  Lưu lại
-                </button>
+          <div className="w-12 h-1 bg-gray-200 rounded-full mx-auto mb-2" />
+          <div className="flex items-center justify-between">
+            <div className="flex-1 min-w-0 pr-4">
+              <span className="font-bold text-gray-900 text-base truncate block leading-tight">{trip?.name}</span>
+              <p className="text-[11px] text-gray-500 mt-1 flex items-center gap-2">
+                <span><CalendarOutlined className="mr-1" />{board.length} ngày</span>
+                <span className="w-1 h-1 rounded-full bg-gray-300"></span>
+                <span><TeamOutlined className="mr-1" />{trip?.members.length} người</span>
+              </p>
+            </div>
+            <div className="shrink-0">
+              <div className="bg-teal-50 text-teal-600 px-3 py-1.5 rounded-full text-[11px] font-bold">
+                {totalLocations} điểm
               </div>
             </div>
-          )}
-        </MobileBottomSheet>
-      )}
+          </div>
+        </div>
+
+        <div className={`flex flex-col flex-1 overflow-hidden transition-opacity duration-300 delay-100 ${isExpanded ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}>
+          <div className="px-6 pt-4 pb-2 shrink-0 bg-white">
+            {/* GRID MENU MOBILE */}
+            {renderGridMenu()}
+
+            <div className="flex bg-gray-100/80 p-1 rounded-xl mb-2">
+              {(["itinerary", "checklist"] as const).map((t) => (
+                <button
+                  key={t}
+                  disabled={isEditMode && t === "checklist"}
+                  onClick={() => setActiveTab(t)}
+                  className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all duration-200 ${
+                    activeTab === t ? "bg-white shadow-sm text-teal-600" : "text-gray-500 hover:text-gray-700"
+                  }`}
+                >
+                  {t === "itinerary" ? "Lịch trình" : "Checklist"}
+                </button>
+              ))}
+            </div>
+            {activeTab === "itinerary" && !isEditMode && (
+              <div className="flex gap-1.5 mt-3 mb-2">
+                {(["all", "group", "personal"] as FilterTab[]).map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setFilterTab(tab)}
+                    className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 border ${
+                      filterTab === tab ? "bg-teal-50 text-teal-600 border-teal-200" : "bg-white text-gray-500 border-gray-200"
+                    }`}
+                  >
+                    {tab === "all" ? "Tất cả" : tab === "group" ? "Nhóm" : "Cá nhân"}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          <div className="flex-1 overflow-y-auto min-h-0 px-6 pb-6">
+            {activeTab === "itinerary" ? renderItineraryContent() : renderChecklistContent()}
+          </div>
+        </div>
+      </div>
 
       {/* ── DESKTOP: Drawer cho Cập nhật hoạt động ── */}
       {typeof window !== "undefined" && window.innerWidth >= 768 && (
@@ -475,6 +528,81 @@ export default function TripDetailPage() {
             </div>
           )}
         </Drawer>
+      )}
+
+      {/* ── MOBILE: Bottom Sheet cho Cập nhật hoạt động ── */}
+      {typeof window !== "undefined" && window.innerWidth < 768 && (
+        <MobileBottomSheet
+          open={isDetailOpen}
+          onClose={() => setIsDetailOpen(false)}
+          title="Cập nhật hoạt động"
+          defaultVh={70}
+          maxVh={90}
+        >
+          {editingItem && (
+            <div className="p-5 space-y-5">
+              <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-start gap-3.5">
+                <div className="w-11 h-11 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center shrink-0">
+                  <MapPin size={20} />
+                </div>
+                <div>
+                  <h3 className="font-black text-base text-gray-900">{editingItem.item.name}</h3>
+                  <p className="text-xs text-gray-400 font-medium flex items-center gap-1 mt-0.5">
+                    <Calendar size={12} /> Thuộc {board.find(c => c.id === editingItem.dayId)?.day}
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1 mb-1 block">Thời gian dự kiến</label>
+                  <Input 
+                    type="time" 
+                    value={formData.time}
+                    onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                    size="large"
+                    prefix={<Clock size={16} className="text-gray-400 mr-1" />}
+                    className="rounded-xl border-gray-200 h-11 shadow-sm font-medium"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1 mb-1 block">Chi phí ước tính</label>
+                  <Input 
+                    placeholder="Vd: 150,000đ, Miễn phí..."
+                    value={formData.cost}
+                    onChange={(e) => setFormData({ ...formData, cost: e.target.value })}
+                    size="large"
+                    prefix={<DollarSign size={16} className="text-gray-400 mr-1" />}
+                    className="rounded-xl border-gray-200 h-11 shadow-sm font-medium"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1 mb-1 block">Ghi chú hành trình</label>
+                  <Input.TextArea 
+                    placeholder="Nhập ghi chú cho địa điểm này..."
+                    value={formData.note}
+                    onChange={(e) => setFormData({ ...formData, note: e.target.value })}
+                    autoSize={{ minRows: 3, maxRows: 5 }}
+                    className="rounded-xl border-gray-200 shadow-sm p-3 text-xs font-medium"
+                  />
+                </div>
+              </div>
+
+              {/* Nút lưu cho bản Mobile */}
+              <div className="pt-2">
+                <Button 
+                  type="primary" 
+                  onClick={handleSaveDetail} 
+                  className="w-full bg-teal-600 rounded-xl h-11 font-bold text-sm shadow-md"
+                >
+                  Lưu cập nhật
+                </Button>
+              </div>
+            </div>
+          )}
+        </MobileBottomSheet>
       )}
 
       {/* ── NÚT MỞ BOTTOM SHEET KHÁM PHÁ & THÊM ĐỊA ĐIỂM (MOBILE) ── */}
