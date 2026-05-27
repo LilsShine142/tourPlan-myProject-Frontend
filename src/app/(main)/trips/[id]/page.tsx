@@ -37,6 +37,7 @@ import LocationCard from "./components/LocationCard";
 import ItineraryContent from "./components/ItineraryContent";
 import ChecklistContent from "./components/ChecklistContent";
 import ItineraryBuilder from "./components/ItineraryBuilder";
+import { Map, type MapRef } from "@/components/ui/map";
 
 type FilterTab = "all" | "group" | "personal";
 type ActiveTab = "itinerary" | "checklist";
@@ -69,14 +70,20 @@ const MOCK_CHECKLIST: ChecklistItem[] = [
   { id: "4", label: "Thuê xe máy tại Đà Lạt", checked: false },
 ];
 
+// Cấu hình Map Styles
+const MAP_STYLES = {
+  default: undefined,
+  openstreetmap: "https://tiles.openfreemap.org/styles/bright",
+  openstreetmap3d: "https://tiles.openfreemap.org/styles/liberty",
+};
+type MapStyleKey = keyof typeof MAP_STYLES;
+
 export default function TripDetailPage() {
   const params = useParams();
   const router = useRouter();
   const id = typeof params?.id === "string" ? params.id : Array.isArray(params?.id) ? params.id[0] : undefined;
   const trip = MOCK_TRIPS.find(t => t.id === id);
   const days = MOCK_ITINERARY_DAYS;
-
-  const { globalLoading, setGlobalLoading } = useUIStore();
 
   // ── States Gốc ──
   const [isMounted, setIsMounted] = useState(false);
@@ -86,6 +93,17 @@ export default function TripDetailPage() {
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
   const startY = useRef(0);
+
+  // ── States Map ──
+  const mapRef = useRef<MapRef>(null);
+  const [mapStyle, setMapStyle] = useState<MapStyleKey>("default");
+  const selectedMapStyle = MAP_STYLES[mapStyle];
+  const is3D = mapStyle === "openstreetmap3d";
+
+  useEffect(() => {
+    mapRef.current?.easeTo({ pitch: is3D ? 60 : 0, duration: 500 });
+  }, [is3D]);
+
   // Bottom sheet handlers
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (isEditMode) return; // Không cho kéo khi đang edit
@@ -300,13 +318,29 @@ export default function TripDetailPage() {
     <div className="fixed inset-0 h-dvh w-full overflow-hidden bg-gray-100">
       {/* ── BẢN ĐỒ CHUNG ── */}
       <div className="absolute inset-0 z-0 bg-slate-200">
-        <iframe
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3903.2854291244383!2d108.43431147585012!3d11.954546436380644!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x317112d4a0604b0b%3A0x8673da0e6afefaf0!2zQ2jhu6MgxJDDoCBM4bqhdA!5e0!3m2!1svi!2s!4v1716611223456!5m2!1svi!2s"
-          className="w-full h-full pointer-events-auto"
-          style={{ border: 0 }}
-          allowFullScreen
-          loading="lazy"
+        <Map
+          ref={mapRef}
+          center={[108.4583, 11.9404]} // Tọa độ mặc định (VD: Đà Lạt)
+          zoom={13}
+          styles={
+            selectedMapStyle
+              ? { light: selectedMapStyle, dark: selectedMapStyle }
+              : undefined
+          }
         />
+
+        {/* Tuỳ chọn thay đổi loại bản đồ (Map Style Selector) */}
+        <div className="absolute top-20 right-4 z-10 pointer-events-auto">
+          <select
+            value={mapStyle}
+            onChange={(e) => setMapStyle(e.target.value as MapStyleKey)}
+            className="bg-white/95 backdrop-blur-md text-gray-800 rounded-lg border border-gray-100 px-3 py-2 text-sm font-medium shadow-sm outline-none cursor-pointer hover:bg-white transition-colors"
+          >
+            <option value="default">Default (Carto)</option>
+            <option value="openstreetmap">OpenStreetMap</option>
+            <option value="openstreetmap3d">OpenStreetMap 3D</option>
+          </select>
+        </div>
       </div>
 
       {/* ── TOPBAR CHUNG ── */}
@@ -382,12 +416,9 @@ export default function TripDetailPage() {
         </aside>
       </div>
 
-
-
-
       {/* ── MOBILE LAYOUT: Bottom Sheet kéo thả ── */}
       <div
-        className="md:hidden absolute bottom-0 left-0 right-0 z-40 bg-white rounded-t-4xl shadow-[0_-12px_40px_rgba(0,0,0,0.12)] flex flex-col h-[85vh] will-change-transform"
+        className="md:hidden absolute bottom-0 left-0 right-0 z-40 bg-white rounded-t-4xl shadow-[0_-12px_40px_rgba(0,0,0,0.12)] flex flex-col h-[80%] will-change-transform"
         style={{
           transform: getSheetTransform(),
           transition: isDragging ? 'none' : 'transform 0.45s cubic-bezier(0.32,0.72,0,1)'
