@@ -12,10 +12,11 @@ interface PlaceItem {
 
 interface LocationCardProps {
   loc: PlaceItem;
+  onClick?: () => void;
 }
 
-const LocationCard: React.FC<LocationCardProps> = ({ loc }) => (
-  <div key={loc.id} className="flex items-start gap-3 bg-white rounded-2xl p-3.5 shadow-sm border border-gray-100 transition-all hover:shadow-md">
+const LocationCard: React.FC<LocationCardProps> = ({ loc, onClick }) => (
+  <div key={loc.id} className="flex items-start gap-3 bg-white rounded-2xl p-3.5 shadow-sm border border-gray-100 transition-all hover:shadow-md cursor-pointer" onClick={onClick}>
     <div className="w-9 h-9 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center text-lg shrink-0 mt-0.5">
       <EnvironmentOutlined />
     </div>
