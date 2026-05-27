@@ -30,7 +30,7 @@ import { MOCK_TRIPS, MOCK_ITINERARY_DAYS } from "@/lib/mockData";
 import { formatDayOfWeek } from "@/utils";
 import { ItineraryLocation } from "@/models";
 import { useUIStore } from "@/store/zustandStore";
-import { SpinnerLoading } from "@/components/ui/loaders";
+import { GlobalOverlayLoading } from "@/components/ui/loaders";
 import MobileBottomSheet from "@/components/MobileBottomSheet";
 import renderGridMenu from "@/app/(main)/components/RenderGridMenu";
 import LocationCard from "./components/LocationCard";
@@ -174,7 +174,7 @@ export default function TripDetailPage() {
   }, []);
 
   if (!isMounted) {
-    return <SpinnerLoading text="Đang chuẩn bị dữ liệu chuyến đi..." />;
+    return <GlobalOverlayLoading isSolid={true} />;
   }
 
   // ── Logic Xử Lý Kéo Thả (Giữ nguyên từ ItineraryBuilder) ──

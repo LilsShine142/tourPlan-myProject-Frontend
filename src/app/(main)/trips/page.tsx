@@ -316,7 +316,7 @@ export default function TripsPage() {
         <PlusOutlined className="text-2xl" />
       </button>
 
-      <CreateTripModal open={showCreate} onClose={() => setShowCreate(false)} />
+      <CreateTripModal open={showCreate} onClose={() => setShowCreate(false)} onSave={() => {}} />
     </div>
   );
 }

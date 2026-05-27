@@ -1,13 +1,11 @@
-// Đường dẫn: components/ui/loaders.tsx
-import { Loader2 } from "lucide-react";
+import { Spin } from "antd";
 import { Skeleton } from "@/components/ui/skeleton";
 
-// 1. Loading xoay tròn cơ bản (Dùng cho TripDetail)
-export function SpinnerLoading({ text = "Đang tải dữ liệu..." }: { text?: string }) {
+// 1. Loading xoay tròn cơ bản (Dùng bên trong các component con)
+export function SpinnerLoading() {
   return (
-    <div className="h-screen w-full bg-white flex flex-col items-center justify-center space-y-3 transition-opacity duration-300">
-      <Loader2 className="w-8 h-8 animate-spin text-teal-500" />
-      <p className="text-gray-500 font-medium animate-pulse">{text}</p>
+    <div className="w-full py-12 flex items-center justify-center transition-opacity duration-300">
+      <Spin size="large" />
     </div>
   );
 }
@@ -30,10 +28,17 @@ export function ListSkeletonLoading() {
 }
 
 // 3. Loading Global (Phủ toàn màn hình khi submit form/chuyển trang nặng)
-export function GlobalOverlayLoading() {
+// Sử dụng Spin của antd và điều chỉnh mảng màu nền thông qua prop isSolid
+export function GlobalOverlayLoading({ isSolid = false }: { isSolid?: boolean }) {
   return (
-    <div className="fixed inset-0 z-[9999] bg-white/80 backdrop-blur-sm flex items-center justify-center">
-      <div className="h-16 w-16 rounded-full border-4 border-t-teal-500 border-gray-200 animate-spin" />
+    <div 
+      className={`fixed inset-0 z-[9999] flex items-center justify-center transition-all duration-300 ${
+        isSolid 
+          ? "bg-[#F8F9FA]" // Nền màu xám nhạt (đặc) che FOUC lúc mới vào trang
+          : "bg-white/70 backdrop-blur-md" // Nền mờ (kính) sang trọng khi đang submit thao tác
+      }`}
+    >
+      <Spin size="large" />
     </div>
   );
 }

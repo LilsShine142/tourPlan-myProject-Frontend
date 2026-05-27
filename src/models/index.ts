@@ -23,6 +23,18 @@ export interface User {
 }
 
 export interface UserProfile extends User {
+  bio?: string;
+  birthday?: string;
+  gender?: "male" | "female" | "other";
+  coverUrl?: string;
+  phone?: string;
+  address?: string;
+  socialLinks?: {
+    facebook?: string;
+    instagram?: string;
+    tiktok?: string;
+    [key: string]: string | undefined;
+  };
   groupCount: number;
   bankAccountCount: number;
   theme: ThemeMode;
@@ -258,6 +270,7 @@ export interface ItineraryDay {
 }
 
 export interface ItineraryLocation {
+  date: string;
   id: string;
   dayId: string;
   tripId: string;
