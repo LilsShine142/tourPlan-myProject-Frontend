@@ -9,18 +9,16 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   
   // Kiểm tra xem có đang ở trang chi tiết chuyến đi không.
   const isTripDetail = pathname?.includes("/trips/") && pathname !== "/trips";
-  
-  // Kiểm tra xem có đang ở trang chi tiết nhóm không (VD: /groups/123)
-  const isGroupDetail = pathname?.includes("/groups/") && pathname !== "/groups";
-  
+
   // Gom điều kiện: Ẩn thanh Nav tổng trên Mobile nếu đang ở bất kỳ trang chi tiết nào
-  const hideNavOnMobile = isTripDetail || isGroupDetail;
+  const hideNavOnMobile = isTripDetail;
 
   return (
     <div className="relative flex flex-col min-h-screen bg-gray-50/50">
       
       {/* ── APP HEADER: Hiển thị thanh công cụ & user ở trên cùng ── */}
-      <AppHeader />
+      {!isTripDetail && <AppHeader />}
+
 
       {/* ── MAIN CONTENT AREA ── */}
       <main className="flex-1 overflow-y-auto w-full pb-20 md:pb-24 scroll-smooth">

@@ -48,7 +48,20 @@ export async function GET(request: Request) {
 
       return NextResponse.json({ result: formattedResult });
     } else {
-      return NextResponse.json({ error: 'Không tìm thấy địa điểm trên OpenStreetMap' }, { status: 404 });
+      // Không có match trên OSM: trả về dạng `result` trống để frontend vẫn render được.
+      // (Tránh việc frontend throw error và làm gián đoạn UI.)
+      return NextResponse.json({
+        result: {
+          name: '',
+          rating: undefined,
+          user_ratings_total: undefined,
+          formatted_phone_number: 'Chưa cập nhật',
+          website: 'Không có website',
+          current_opening_hours: null,
+          url: undefined,
+        },
+        error: 'Không tìm thấy địa điểm trên OpenStreetMap'
+      }, { status: 200 });
     }
   } catch (error) {
     return NextResponse.json({ error: 'Lỗi server nội bộ khi gọi OSM' }, { status: 500 });

@@ -34,28 +34,47 @@ export default function MobileBottomSheet({
   const startTimeRef = useRef(0);
   const lastDyRef = useRef(0);
   const currentHRef = useRef(0); // luôn sync với currentH, dùng trong callbacks
-
+  // Dùng để quản lý timeout đóng sheet
+  const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const getMaxH = () => (window.innerHeight * maxVh) / 100;
   const getDefaultH = () => (window.innerHeight * defaultVh) / 100;
 
   // Mở / đóng
   useEffect(() => {
+    // Xóa timeout đóng cũ nếu có để tránh xung đột khi click nhanh
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
+
     if (open) {
       setVisible(true);
-      setCurrentH(0);
-      currentHRef.current = 0;
-      requestAnimationFrame(() =>
+      
+      // Delay nhẹ để đảm bảo DOM đã render trước khi chạy animation
+      requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           const h = getDefaultH();
           setCurrentH(h);
           currentHRef.current = h;
-        })
-      );
+        });
+      });
     } else {
       setCurrentH(0);
       currentHRef.current = 0;
-      setTimeout(() => setVisible(false), 440);
+      
+      // Gán timeout vào ref để có thể clear
+      closeTimeoutRef.current = setTimeout(() => {
+        setVisible(false);
+        closeTimeoutRef.current = null;
+      }, 440); // 440ms phải match với thời gian transition
     }
+
+    // Cleanup function khi component unmount
+    return () => {
+      if (closeTimeoutRef.current) {
+        clearTimeout(closeTimeoutRef.current);
+      }
+    };
   }, [open, defaultVh]);
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
@@ -107,7 +126,9 @@ export default function MobileBottomSheet({
   const dismiss = useCallback(() => {
     setCurrentH(0);
     currentHRef.current = 0;
-    setTimeout(onClose, 440);
+    // Gọi onClose để báo cho component cha biết cần đóng
+    // Component cha sẽ đổi prop `open` thành false, từ đó trigger useEffect phía trên
+    onClose();
   }, [onClose]);
 
   if (!visible) return null;
