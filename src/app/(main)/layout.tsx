@@ -20,7 +20,8 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     <div className="relative flex flex-col min-h-screen bg-gray-50/50">
       
       {/* ── APP HEADER: Hiển thị thanh công cụ & user ở trên cùng ── */}
-      <AppHeader />
+      {!isTripDetail && !isGroupDetail && <AppHeader />}
+
 
       {/* ── MAIN CONTENT AREA ── */}
       <main className="flex-1 overflow-y-auto w-full pb-20 md:pb-24 scroll-smooth">
