@@ -269,6 +269,8 @@ export interface ItineraryDay {
   locations: ItineraryLocation[];
 }
 
+export type TravelMode = "driving" | "walking" | "transit" | "bicycling" | "flight";
+
 export interface ItineraryLocation {
   date: string;
   id: string;
@@ -277,12 +279,23 @@ export interface ItineraryLocation {
   name: string;
   address?: string;
   category: LocationCategory;
+  
+  // -- Cốt lõi cho Bản đồ --
   lat?: number;
   lng?: number;
+  placeId?: string; // BỔ SUNG: Dùng để gọi API chính xác của Google/Mapbox
+
   startTime?: string;              // "09:00"
   endTime?: string;                // "10:00"
   note?: string;
   order: number;                   // thứ tự trong ngày
+  
+  // -- BỔ SUNG: Dành cho tính năng Chỉ đường (Tùy chọn nhưng khuyên dùng) --
+  travelModeToNext?: TravelMode;   // Phương tiện để đi đến điểm tiếp theo (nếu có)
+  distanceToNext?: number;         // Khoảng cách tới điểm tiếp theo (đơn vị: mét)
+  durationToNext?: number;         // Thời gian di chuyển ước tính (đơn vị: giây)
+  routePolyline?: string;          // Lưu trữ chuỗi mã hóa đoạn đường vẽ trên map (giúp vẽ line offline không cần gọi API)
+
   createdAt: string;
 }
 
