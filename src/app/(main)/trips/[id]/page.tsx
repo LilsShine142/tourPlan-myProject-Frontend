@@ -544,7 +544,7 @@ export default function TripDetailPage() {
       </div>
 
       {/* Topbar */}
-      <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-4 pt-4 pb-3 pointer-events-none">
+      <div className="absolute top-0 left-0 right-0 z-[200] flex items-center justify-between px-4 pt-4 pb-3 pointer-events-none">
         <Link href={APP_ROUTES.MAIN.TRIPS} className="pointer-events-auto flex items-center gap-2 bg-white/95 backdrop-blur-md rounded-full px-4 py-2.5 shadow-sm hover:bg-white border border-gray-100">
           <ArrowLeftOutlined className="text-gray-700" />
           <span className="font-bold text-gray-900 truncate max-w-[150px] text-sm">{trip?.name}</span>
