@@ -205,8 +205,18 @@ export default function TripDetailPage() {
     setIsLoadingDetails(true);
     setPlaceDetails(null);
     try {
-      const res = await fetch(`/api/places?placeId=${osmId}`);
-      if (!res.ok) throw new Error("Lỗi mạng");
+      const res = await fetch(`/api/places?placeId=${encodeURIComponent(osmId)}`);
+      if (!res.ok) {
+        // cố gắng đọc message từ API để hiển thị chi tiết hơn
+        let errMsg = "Lỗi mạng";
+        try {
+          const errJson = await res.json();
+          errMsg = errJson?.error || errMsg;
+        } catch {
+          // ignore
+        }
+        throw new Error(errMsg);
+      }
       const data = await res.json();
       
       if (data && data.result) {
@@ -224,7 +234,7 @@ export default function TripDetailPage() {
       console.error("Lỗi fetch chi tiết", error);
       message.error("Không thể tải dữ liệu bản đồ.");
     } finally {
-      setIsLoadingDetails(false);
+    setIsLoadingDetails(false);
     }
   };
 
@@ -352,7 +362,8 @@ export default function TripDetailPage() {
 
         return (
           <MapMarker
-            key={item.id}
+            // Ensure uniqueness even if backend/mock data has duplicated item.id across days
+            key={`${dayCol.id}-${item.id}`}
             longitude={item.lng}
             latitude={item.lat}
             anchor="bottom"
@@ -544,10 +555,10 @@ export default function TripDetailPage() {
       </div>
 
       {/* Topbar */}
-      <div className="absolute top-0 left-0 right-0 z-[200] flex items-center justify-between px-4 pt-4 pb-3 pointer-events-none">
+      <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-4 pt-4 pb-3 pointer-events-none">
         <Link href={APP_ROUTES.MAIN.TRIPS} className="pointer-events-auto flex items-center gap-2 bg-white/95 backdrop-blur-md rounded-full px-4 py-2.5 shadow-sm hover:bg-white border border-gray-100">
           <ArrowLeftOutlined className="text-gray-700" />
-          <span className="font-bold text-gray-900 truncate max-w-[150px] text-sm">{trip?.name}</span>
+          <span className="font-bold text-gray-900 truncate max-w-[150px] text-sm">Quay lại</span>
         </Link>
         <div className="flex items-center gap-2 pointer-events-auto">
           <button className="w-10 h-10 bg-white/95 backdrop-blur-md rounded-full flex items-center justify-center shadow-sm hover:bg-white border border-gray-100">
@@ -571,8 +582,11 @@ export default function TripDetailPage() {
         <aside className={`absolute -top-[15px] bottom-[90px] left-[15px] w-[400px] bg-white rounded-3xl shadow-2xl z-20 flex flex-col overflow-hidden pointer-events-auto transition-transform duration-500 ${sidebarOpen ? "translate-x-0" : "-translate-x-[calc(100%+30px)]"}`}>
           <div className="px-6 pt-5 pb-4 border-b border-gray-50 shrink-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <Tag color="cyan" className="rounded-full border-0 bg-cyan-50 text-cyan-600"><CalendarOutlined /> {board.length} ngày</Tag>
-              <Tag color="green" className="rounded-full border-0 bg-green-50 text-green-600"><DownloadOutlined /> {board.reduce((s, d) => s + d.items.length, 0)} điểm</Tag>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-base font-bold text-gray-900 truncate max-w-[280px]">{trip?.name}</span>
+                <Tag color="cyan" className="rounded-full border-0 bg-cyan-50 text-cyan-600"><CalendarOutlined /> {board.length} ngày</Tag>
+                <Tag color="green" className="rounded-full border-0 bg-green-50 text-green-600"><DownloadOutlined /> {board.reduce((s, d) => s + d.items.length, 0)} điểm</Tag>
+              </div>
             </div>
           </div>
           <div className="px-6 pt-4 shrink-0">
